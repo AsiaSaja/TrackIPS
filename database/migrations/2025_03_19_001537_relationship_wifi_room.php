@@ -22,6 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::table('wifis',function (Blueprint $table) {
+            $table->dropForeign(['room']);
+        }); 
     }
 };
