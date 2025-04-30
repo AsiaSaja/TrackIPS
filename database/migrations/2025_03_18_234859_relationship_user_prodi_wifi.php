@@ -13,8 +13,8 @@ return new class extends Migration
     {
         //
         Schema::table('users',function (Blueprint $table) {
-            $table->foreignId('prodi_id')->constrained('prodis');
-            $table->string('BSSID');
+            $table->foreignId('prodi_id')->nullable()->constrained('prodis');
+            $table->string('BSSID')->nullable();
             $table->foreign('BSSID')->references('BSSID')->on('wifis');
         });
     }
