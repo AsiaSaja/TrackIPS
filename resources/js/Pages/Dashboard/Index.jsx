@@ -32,13 +32,13 @@ export default function Dashboard({ auth }) {
                         </tr>
                         </thead>
                         <tbody>
-                            {[1, 2, 3].map((item) => (
-                                <tr key={item} className="border-b last:border-b-0">
-                                <td className="py-4">User {item}</td>
-                                <td>Created new project</td>
-                                <td>2024-03-0{item}</td>
-                                </tr>
-                            ))}
+                        {[1, 2, 3].map((item) => (
+                            <tr key={item} className="border-b last:border-b-0">
+                            <td className="py-4">User {item}</td>
+                            <td>Created new project</td>
+                            <td>2024-03-0{item}</td>
+                            </tr>
+                        ))}
                         </tbody>
                     </table>
                 </div>
