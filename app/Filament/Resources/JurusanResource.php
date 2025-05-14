@@ -2,23 +2,22 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\DeveloperResource\Pages;
-use App\Filament\Resources\DeveloperResource\RelationManagers;
-use App\Models\Developer;
+use App\Filament\Resources\JurusanResource\Pages;
+use App\Filament\Resources\JurusanResource\RelationManagers;
+use App\Models\Jurusan;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\TextInput;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class DeveloperResource extends Resource
+class JurusanResource extends Resource
 {
-    protected static ?string $model = Developer::class;
+    protected static ?string $model = Jurusan::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-code-bracket';
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
     public static function form(Form $form): Form
     {
@@ -27,23 +26,8 @@ class DeveloperResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                    // ->searchable(), Searchable cuman ada di TextColumn
-                Forms\Components\TextInput::make('phone_num')
-                    ->tel()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->required()
-                    ->maxLength(255),
-                    // ->searchable(), Searchable cuman ada di TextColumn
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('api_key')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\DatePicker::make('established_date')
+                    ->required(),
             ]);
     }
 
@@ -53,12 +37,9 @@ class DeveloperResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone_num')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('api_key')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('established_date')
+                    ->date()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -84,16 +65,16 @@ class DeveloperResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\ProdisRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDevelopers::route('/'),
-            'create' => Pages\CreateDeveloper::route('/create'),
-            'edit' => Pages\EditDeveloper::route('/{record}/edit'),
+            'index' => Pages\ListJurusans::route('/'),
+            'create' => Pages\CreateJurusan::route('/create'),
+            'edit' => Pages\EditJurusan::route('/{record}/edit'),
         ];
     }
 }

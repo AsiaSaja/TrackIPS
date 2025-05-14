@@ -2,48 +2,39 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\DeveloperResource\Pages;
-use App\Filament\Resources\DeveloperResource\RelationManagers;
-use App\Models\Developer;
+use App\Filament\Resources\WifiResource\Pages;
+use App\Filament\Resources\WifiResource\RelationManagers;
+use App\Models\Wifi;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\TextInput;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class DeveloperResource extends Resource
+class WifiResource extends Resource
 {
-    protected static ?string $model = Developer::class;
+    protected static ?string $model = Wifi::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-code-bracket';
+    protected static ?string $navigationIcon = 'heroicon-o-wifi';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+                Forms\Components\TextInput::make('BSSID')
                     ->required()
                     ->maxLength(255),
-                    // ->searchable(), Searchable cuman ada di TextColumn
-                Forms\Components\TextInput::make('phone_num')
-                    ->tel()
+                Forms\Components\TextInput::make('longitude')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
+                Forms\Components\TextInput::make('latitude')
                     ->required()
                     ->maxLength(255),
-                    // ->searchable(), Searchable cuman ada di TextColumn
-                Forms\Components\TextInput::make('password')
-                    ->password()
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('api_key')
-                    ->required()
-                    ->maxLength(255),
+                Forms\Components\Select::make('room')
+                    ->relationship('room', 'name')
+                    ->required(),
             ]);
     }
 
@@ -51,14 +42,14 @@ class DeveloperResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('BSSID')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('phone_num')
+                Tables\Columns\TextColumn::make('longitude')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('email')
+                Tables\Columns\TextColumn::make('latitude')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('api_key')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('room.name')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -91,9 +82,9 @@ class DeveloperResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDevelopers::route('/'),
-            'create' => Pages\CreateDeveloper::route('/create'),
-            'edit' => Pages\EditDeveloper::route('/{record}/edit'),
+            'index' => Pages\ListWifis::route('/'),
+            'create' => Pages\CreateWifi::route('/create'),
+            'edit' => Pages\EditWifi::route('/{record}/edit'),
         ];
     }
 }

@@ -1,16 +1,44 @@
-import React from 'react';
-import { Link, Head, useForm } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
+import { Link, Head, useForm, usePage } from '@inertiajs/react';
 
 export default function Login() {
-  const { data, setData, post, processing, errors } = useForm({
+  const { data, setData, post, processing, errors, reset } = useForm({
     email: '',
     password: '',
     remember: false,
   });
 
+  const { flash } = usePage().props;
+  
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('error'); // 'error' or 'success'
+
+  // Check for errors and success messages
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      setShowAlert(true);
+      setAlertMessage(Object.values(errors).join(', '));
+      setAlertType('error');
+    } else if (flash && flash.success) {
+      setShowAlert(true);
+      setAlertMessage(flash.success);
+      setAlertType('success');
+    }
+  }, [errors, flash]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    post('/login');
+    post('/login', {
+      onError: (errors) => {
+        // Additional error handling can go here if needed
+        console.log('Login errors:', errors);
+      }
+    });
+  };
+
+  const closeAlert = () => {
+    setShowAlert(false);
   };
 
   return (
@@ -31,7 +59,7 @@ export default function Login() {
                 href="/admin/login"
                 className="ml-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
               >
-                Admin Panel
+                Admin Login
               </Link>
             </div>
           </div>
@@ -53,6 +81,46 @@ export default function Login() {
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+            {/* Alert Component */}
+            {showAlert && (
+              <div className={`mb-4 ${alertType === 'error' ? 'bg-red-50 border-red-500' : 'bg-green-50 border-green-500'} border-l-4 p-4 rounded-md`}>
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    {alertType === 'error' ? (
+                      <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    ) : (
+                      <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="ml-3">
+                    <h3 className={`text-sm font-medium ${alertType === 'error' ? 'text-red-800' : 'text-green-800'}`}>
+                      {alertType === 'error' ? 'Login Failed' : 'Success'}
+                    </h3>
+                    <div className={`mt-1 text-sm ${alertType === 'error' ? 'text-red-700' : 'text-green-700'}`}>
+                      {alertMessage}
+                    </div>
+                  </div>
+                  <div className="ml-auto pl-3">
+                    <div className="-mx-1.5 -my-1.5">
+                      <button
+                        onClick={closeAlert}
+                        className={`inline-flex rounded-md p-1.5 ${alertType === 'error' ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'bg-green-50 text-green-500 hover:bg-green-100'} focus:outline-none focus:ring-2 focus:ring-offset-2 ${alertType === 'error' ? 'focus:ring-red-500' : 'focus:ring-green-500'}`}
+                      >
+                        <span className="sr-only">Dismiss</span>
+                        <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">

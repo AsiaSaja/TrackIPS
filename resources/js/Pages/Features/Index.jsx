@@ -25,15 +25,9 @@ export default function Features() {
               <Link href="/features" className="text-indigo-600 font-medium">Features</Link>
               <Link href="/about" className="text-gray-600 hover:text-gray-900">About</Link>
               
-              {user ? (
+              {auth?.user ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-gray-700">Welcome, {user.name}</span>
-                  <Link
-                    href="/dashboard"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
-                  >
-                    Dashboard
-                  </Link>
+                  <span className="text-gray-700">Welcome, {auth.user.name}</span>
                   <Link
                     href="/logout"
                     method="post"
@@ -145,7 +139,7 @@ export default function Features() {
                   Course Management
                 </h3>
                 <p className="mt-3 text-lg text-gray-500">
-                  Efficiently organize courses, curricula, and educational resources from a centralized dashboard. Our intuitive interface makes it easy to manage all aspects of your courses.
+                  Efficiently organize courses, curricula, and educational resources with our intuitive interface. Easily manage all aspects of your courses and educational content.
                 </p>
                 <div className="mt-6">
                   <ul className="space-y-3">
