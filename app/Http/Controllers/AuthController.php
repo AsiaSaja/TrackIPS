@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Config;
 
 class AuthController extends Controller
 {
@@ -41,6 +42,9 @@ class AuthController extends Controller
 
         // Now attempt authentication
         if (Auth::attempt($credentials)) {
+            // Extend session lifetime to 24 hours (1440 minutes)
+            Config::set('session.lifetime', 1440);
+            
             $request->session()->regenerate();
 
             $user = Auth::user();
@@ -49,10 +53,10 @@ class AuthController extends Controller
             // Redirect based on user status
             if ($user->status === 'Admin') {
                 Log::info('Redirecting admin to /admin');
-                return redirect('/admin'); // Redirect to Filament dashboard
+                return redirect('/admin')->with('success', 'Login berhasil! Selamat datang, Admin.'); // Redirect to Filament dashboard
             } else {
                 Log::info('Redirecting regular user to /home');
-                return redirect()->intended('/home'); // Regular users go to home/landing page
+                return redirect()->intended('/home')->with('success', 'Login berhasil! Selamat datang, ' . $user->name . '.'); // Regular users go to home/landing page
             }
         }
 
@@ -184,11 +188,13 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        Log::info('User logout: ' . (Auth::user() ? Auth::user()->email : 'Unknown user'));
+        
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/login');
+        return redirect('/login')->with('success', 'Anda berhasil logout.');
     }
 } 

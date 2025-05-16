@@ -1,9 +1,21 @@
 import React from 'react';
-import { Link, Head, usePage } from '@inertiajs/react';
+import { Link, Head, usePage, router } from '@inertiajs/react';
 
 export default function Index() {
   const { auth } = usePage().props;
   const user = auth?.user;
+
+  const handleLogout = () => {
+    router.post('/logout', {}, {
+      preserveState: false,
+      onSuccess: () => {
+        window.location.href = '/login';
+      },
+      onError: () => {
+        alert('Terjadi kesalahan saat logout. Silakan coba lagi.');
+      }
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -27,14 +39,12 @@ export default function Index() {
               {user ? (
                 <div className="flex items-center space-x-4">
                   <span className="text-gray-700">Welcome, {user.name}</span>
-                  <Link
-                    href="/logout"
-                    method="post"
-                    as="button"
+                  <button
+                    onClick={handleLogout}
                     className="text-gray-600 hover:text-gray-900"
                   >
                     Logout
-                  </Link>
+                  </button>
                 </div>
               ) : (
                 <div className="flex items-center space-x-4">

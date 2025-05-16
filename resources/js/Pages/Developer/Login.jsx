@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, Head, useForm, usePage } from '@inertiajs/react';
 
-export default function AdminLogin({ error }) {
+export default function DeveloperLogin({ error }) {
   const { flash } = usePage().props;
   const { data, setData, post, processing, errors } = useForm({
     email: '',
@@ -10,26 +10,45 @@ export default function AdminLogin({ error }) {
   });
 
   const [showPassword, setShowPassword] = useState(false);
-  const [showAlert, setShowAlert] = useState(!!error || !!flash?.success);
-  const [alertMessage, setAlertMessage] = useState(error || flash?.success || '');
+  const [showAlert, setShowAlert] = useState(!!error || !!flash?.success || !!flash?.error);
+  const [alertMessage, setAlertMessage] = useState(error || flash?.success || flash?.error || '');
   const [alertType, setAlertType] = useState(flash?.success ? 'success' : 'error');
 
-  // Check for errors and success messages
+  // Check for errors or success messages
   useEffect(() => {
+    // Handle validation errors
     if (Object.keys(errors).length > 0) {
       setShowAlert(true);
       setAlertMessage(Object.values(errors).join(', '));
       setAlertType('error');
-    } else if (flash?.success) {
+    } 
+    // Handle success flash messages
+    else if (flash?.success) {
       setShowAlert(true);
       setAlertMessage(flash.success);
       setAlertType('success');
     }
-  }, [errors, flash]);
+    // Handle error flash messages
+    else if (flash?.error) {
+      setShowAlert(true);
+      setAlertMessage(flash.error);
+      setAlertType('error');
+    }
+    // Handle direct error prop
+    else if (error) {
+      setShowAlert(true);
+      setAlertMessage(error);
+      setAlertType('error');
+    }
+  }, [errors, flash, error]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    post('/admin/login', {
+    post('/developer/login', {
+      onSuccess: () => {
+        // This is handled by redirect from backend
+        console.log('Login successful');
+      },
       onError: (errors) => {
         // Additional error handling
         console.log('Login errors:', errors);
@@ -51,7 +70,7 @@ export default function AdminLogin({ error }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-800 to-gray-900 flex flex-col justify-center">
-      <Head title="Admin Login - TrackIPS" />
+      <Head title="Developer Login - TrackIPS" />
       
       {/* Navigation */}
       <nav className="bg-gray-900 shadow-sm fixed top-0 left-0 right-0 z-50">
@@ -59,7 +78,7 @@ export default function AdminLogin({ error }) {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <span className="text-2xl font-bold text-cyan-500">TrackIPS Admin</span>
+                <span className="text-2xl font-bold text-cyan-500">TrackIPS Developer</span>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -77,10 +96,15 @@ export default function AdminLogin({ error }) {
       <div className="sm:mx-auto sm:w-full sm:max-w-md mt-16">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-            Admin Panel Login
+            Developer Portal Login
           </h2>
           <p className="mt-2 text-sm text-gray-300">
-            Login with your administrator credentials
+            Login with your developer credentials to access API keys
+            <br />
+            Or{' '}
+            <Link href="/developer/register" className="font-medium text-cyan-400 hover:text-cyan-300">
+              register for a new developer account
+            </Link>
           </p>
         </div>
 
@@ -107,7 +131,7 @@ export default function AdminLogin({ error }) {
                     <div className="-mx-1.5 -my-1.5">
                       <button
                         onClick={closeAlert}
-                        className={`inline-flex rounded-md p-1.5 ${alertType === 'success' ? 'bg-green-900 text-green-300 hover:bg-green-800' : 'bg-red-900 text-red-300 hover:bg-red-800'} focus:outline-none focus:ring-2 focus:ring-offset-2 ${alertType === 'success' ? 'focus:ring-green-500' : 'focus:ring-red-500'} focus:ring-offset-gray-800`}
+                        className={`inline-flex rounded-md p-1.5 ${alertType === 'success' ? 'bg-green-900 text-green-300 hover:bg-green-800' : 'bg-red-900 text-red-300 hover:bg-red-800'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 ${alertType === 'success' ? 'focus:ring-green-600' : 'focus:ring-red-600'}`}
                       >
                         <span className="sr-only">Dismiss</span>
                         <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -198,7 +222,7 @@ export default function AdminLogin({ error }) {
                   disabled={processing}
                   className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
                 >
-                  {processing ? 'Signing in...' : 'Sign in as Administrator'}
+                  {processing ? 'Signing in...' : 'Sign in as Developer'}
                 </button>
               </div>
             </form>
@@ -212,7 +236,7 @@ export default function AdminLogin({ error }) {
           <div className="border-t border-gray-700 pt-8 md:flex md:items-center md:justify-between">
             <div className="mt-8 md:mt-0 md:order-1">
               <p className="text-center text-base text-gray-400">
-                &copy; 2023 TrackIPS Admin Panel. All rights reserved.
+                &copy; 2023 TrackIPS Developer Portal. All rights reserved.
               </p>
             </div>
           </div>

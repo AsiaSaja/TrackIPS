@@ -24,3 +24,7 @@ createInertiaApp({
     createRoot(el).render(<App {...props} />)
   },
 })
+
+// Import ziggy route helper for use in inertia pages
+import { route } from 'ziggy-js';
+window.route = route;

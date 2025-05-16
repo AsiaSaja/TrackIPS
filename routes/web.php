@@ -5,6 +5,8 @@ use App\Models\Jurusan;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminAuthController;
+use App\Http\Controllers\DeveloperPanelController;
+use App\Http\Controllers\SessionController;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,6 +24,12 @@ Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
     Route::post('/admin/login', [AdminAuthController::class, 'login']);
     
+    // Developer login/register
+    Route::get('/developer/login', [DeveloperPanelController::class, 'showLoginForm'])->name('developer.login');
+    Route::post('/developer/login', [DeveloperPanelController::class, 'login']);
+    Route::get('/developer/register', [DeveloperPanelController::class, 'showRegisterForm'])->name('developer.register');
+    Route::post('/developer/register', [DeveloperPanelController::class, 'register']);
+    
     // Redirect unauthenticated users to login page
     Route::get('/', function () {
         return redirect()->route('login');
@@ -29,6 +37,17 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+Route::post('/developer/logout', [DeveloperPanelController::class, 'logout'])->middleware('auth:developer')->name('developer.logout');
+
+// Session handling routes
+Route::get('/session/extend', [SessionController::class, 'extendSessionLifetime'])->name('session.extend');
+Route::get('/session/reset', [SessionController::class, 'resetSessionLifetime'])->name('session.reset');
+
+// Developer routes
+Route::middleware('auth:developer')->prefix('developer')->name('developer.')->group(function () {
+    Route::get('/dashboard', [DeveloperPanelController::class, 'dashboard'])->name('dashboard');
+    Route::post('/generate-api-key', [DeveloperPanelController::class, 'generateApiKey'])->name('generate-api-key');
+});
 
 // Protected routes - only accessible when authenticated
 Route::middleware('auth')->group(function () {
