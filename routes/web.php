@@ -5,6 +5,7 @@ use App\Models\Jurusan;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\AuthController;
+use App\Models\Room;
 use Inertia\Inertia;
 
 // Authentication routes for guests only
@@ -35,5 +36,5 @@ Route::middleware('auth')->group(function () {
 
 // Test route
 Route::get('/tes', function () {
-    return dd(Jurusan::find(1));
+    return dd(Room::where('floor',1)->first()->wifis);
 });

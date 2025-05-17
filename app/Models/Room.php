@@ -9,6 +9,10 @@ class Room extends Model
 {
     //
     public function wifis(): HasMany{
-        return $this->hasMany(Wifi::class);
+        return $this->hasMany(Wifi::class,'room');
+    }
+
+    public function roombounds(): HasMany{
+        return $this->hasMany(RoomBound::class);
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\MapController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -9,7 +10,10 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::middleware(['auth:sanctum','ability:access-api'])->group(function () {
-    // Route::get('/login', [AuthController::class, 'showLogin'])->name('login'); 
+    Route::get('/map/{floor}', [MapController::class, 'map']); 
+    // Route::get('/user-resources/{room}', [MapController::class, 'userResources']); 
+    Route::get('/user-detail/{id}', [MapController::class, 'userDetail']); 
+    Route::get('/user-search/{name}', [MapController::class, 'search']); 
 });
 
 Route::prefix('user')->group(function () {
