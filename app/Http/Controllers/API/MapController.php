@@ -36,6 +36,7 @@ class MapController extends Controller
             'data' => $json
         ],200);
     }
+
     function search($name){
         $json = SearchResources::collection(User::whereLike('name','%'.$name.'%')->get());
 
@@ -43,6 +44,17 @@ class MapController extends Controller
             'status' => true,
             'message' => 'Search',
             'data' => $json
+        ],200);
+    }
+
+    function changeLocation(Request $request,$wifi){
+        $new = $request->user();
+        $new->BSSID = $wifi;
+        $new->save();
+        
+        return response()->json([
+            'status' => true,
+            'message' => 'Change Location',
         ],200);
     }
 }

@@ -17,8 +17,8 @@ class UserResources extends JsonResource
         // return parent::toArray($request);
         return [
             'name' => $this->name,
-            'status' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'status' => $this->status,
+            'last_seen' => $this->updated_at,
         ];
     }
 }

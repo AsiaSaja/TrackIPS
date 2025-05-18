@@ -16,7 +16,8 @@ class RoomBoundResources extends JsonResource
     {
         // return parent::toArray($request);
         return [
-            'bounds' => $this->latitude.','.$this->longitude,
+            'latitude' => $this->latitude,
+            'longitude' => $this->longitude,
         ];
     }
 }

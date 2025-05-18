@@ -14,6 +14,7 @@ Route::middleware(['auth:sanctum','ability:access-api'])->group(function () {
     // Route::get('/user-resources/{room}', [MapController::class, 'userResources']); 
     Route::get('/user-detail/{id}', [MapController::class, 'userDetail']); 
     Route::get('/user-search/{name}', [MapController::class, 'search']); 
+    Route::post('/user-update-location/{wifi}', [MapController::class, 'changeLocation']); 
 });
 
 Route::prefix('user')->group(function () {
