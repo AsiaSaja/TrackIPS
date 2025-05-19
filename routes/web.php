@@ -55,8 +55,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/home', [LandingController::class, 'index'])->name('home');
     Route::get('/features', [LandingController::class, 'features'])->name('features');
     Route::get('/about', [LandingController::class, 'about'])->name('about');
-    
-    // Dashboard routes - REMOVED
 });
 
 // Default route for guest users - redirect to login page
