@@ -47,15 +47,19 @@ class DeveloperPanelController extends Controller
                 'email' => 'required|email',
                 'password' => 'required',
             ]);
-
+            
             if (Auth::guard('developer')->attempt($credentials)) {
                 // Extend session lifetime to 24 hours
                 Config::set('session.lifetime', 1440);
                 
+                
                 $request->session()->regenerate();
                 $developer = Auth::guard('developer')->user();
+                // dd($developer);
                 return redirect()->intended(route('developer.dashboard'))
                     ->with('success', 'Login berhasil! Selamat datang, ' . $developer->name . '.');
+
+
             }
 
             // Kredensial tidak valid, kirim error

@@ -4,8 +4,9 @@ import Map from '../User/Map';
 
 // MapSection component
 function MapSection({ user }) {
-  const [userPosition, setUserPosition] = useState([-7.2575, 112.7521]); // Default: ITS Surabaya
+  const [userPosition, setUserPosition] = useState([-6.409090, 108.281653]); // Default: ITS Surabaya
   const [isLocationLoading, setIsLocationLoading] = useState(true);
+  
 
   useEffect(() => {
     // Simulasi mendapatkan lokasi pengguna
@@ -13,8 +14,8 @@ function MapSection({ user }) {
     const getLocation = setTimeout(() => {
       // Contoh: Lokasi disekitar ITS
       const simulatedPosition = [
-        -7.2575 + (Math.random() * 0.002 - 0.001),
-        112.7521 + (Math.random() * 0.002 - 0.001)
+        -6.409090 + (Math.random() * 0.002 - 0.001),
+        108.281653 + (Math.random() * 0.002 - 0.001)
       ];
       setUserPosition(simulatedPosition);
       setIsLocationLoading(false);
@@ -58,20 +59,27 @@ function MapSection({ user }) {
 }
 
 export default function Index() {
-  const { auth } = usePage().props;
+  const { auth, csrf_token } = usePage().props;
   const user = auth?.user;
 
   const handleLogout = () => {
     router.post('/logout', {}, {
+      headers: {
+        'X-CSRF-TOKEN': csrf_token // Gunakan nilai yang sudah diambil di level atas
+      },
       preserveState: false,
+      preserveScroll: false,
       onSuccess: () => {
-        window.location.href = '/login';
+        router.visit('/login'), {
+          replace: true,
+          only: [],
+        };
       },
       onError: () => {
-        alert('Terjadi kesalahan saat logout. Silakan coba lagi.');
+        window.location.href = '/login';
       }
     });
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">

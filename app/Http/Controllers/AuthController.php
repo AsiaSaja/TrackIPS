@@ -43,7 +43,7 @@ class AuthController extends Controller
         // Now attempt authentication
         if (Auth::attempt($credentials)) {
             // Extend session lifetime to 24 hours (1440 minutes)
-            Config::set('session.lifetime', 1440);
+            // Config::set('session.lifetime', 1440);
             
             $request->session()->regenerate();
 
@@ -190,11 +190,15 @@ class AuthController extends Controller
     {
         Log::info('User logout: ' . (Auth::user() ? Auth::user()->email : 'Unknown user'));
         
-        Auth::logout();
-
+        // Gunakan guard web untuk logout
+        Auth::guard('web')->logout();
+        
+        // Invalidasi session
         $request->session()->invalidate();
+        
+        // Regenerate CSRF token
         $request->session()->regenerateToken();
 
-        return redirect('/login')->with('success', 'Anda berhasil logout.');
+        return Inertia::location(route('login')); // Gunakan Inertia::location untuk redirect
     }
 } 

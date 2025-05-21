@@ -4,7 +4,7 @@ import Map from './Map';
 import DashboardLayout from '@/Layouts/DashboardLayout';
 
 export default function UserDashboard({ auth }) {
-  const [userPosition, setUserPosition] = useState([-7.2575, 112.7521]); // Default: ITS Surabaya
+  const [userPosition, setUserPosition] = useState([-6.409090, 108.281653]); // Default: ITS Surabaya
   const [isLocationLoading, setIsLocationLoading] = useState(true);
 
   useEffect(() => {
@@ -13,8 +13,8 @@ export default function UserDashboard({ auth }) {
     const getLocation = setTimeout(() => {
       // Contoh: Lokasi disekitar ITS
       const simulatedPosition = [
-        -7.2575 + (Math.random() * 0.002 - 0.001),
-        112.7521 + (Math.random() * 0.002 - 0.001)
+        -6.409090 + (Math.random() * 0.002 - 0.001),
+        108.281653 + (Math.random() * 0.002 - 0.001)
       ];
       setUserPosition(simulatedPosition);
       setIsLocationLoading(false);

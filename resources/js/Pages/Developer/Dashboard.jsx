@@ -10,6 +10,8 @@ export default function DeveloperDashboard() {
   const [apiKey, setApiKey] = useState(developer.api_key || '');
   const [isCopied, setIsCopied] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
+  const { auth, csrf_token } = usePage().props; // Ambil csrf_token di level terluar komponen
+  const user = auth?.user;
 
   const { post, processing } = useForm();
 
@@ -52,15 +54,22 @@ export default function DeveloperDashboard() {
 
   const handleLogout = () => {
     router.post('/logout', {}, {
-        preserveState: false,
-        onSuccess: () => {
-          window.location.href = '/login';
-        },
-        onError: () => {
-          alert('Terjadi kesalahan saat logout. Silakan coba lagi.');
-        }
-      });
-  };
+      headers: {
+        'X-CSRF-TOKEN': csrf_token // Gunakan nilai yang sudah diambil di level atas
+      },
+      preserveState: false,
+      preserveScroll: false,
+      onSuccess: () => {
+        router.visit('/login'), {
+          replace: true,
+          only: [],
+        };
+      },
+      onError: () => {
+        window.location.href = route('login');
+      }
+    });
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-800 to-gray-900">
