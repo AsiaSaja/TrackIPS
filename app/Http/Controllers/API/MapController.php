@@ -12,6 +12,7 @@ use App\Http\Resources\UserResources;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Room;
+use App\Models\Wifi;
 
 class MapController extends Controller
 {
@@ -29,15 +30,17 @@ class MapController extends Controller
     }
 
     function userInRoom($room){
-
-        $fetch = Room::where('name',$room)->get();
-        dd($room);
-        $json = new UserResources(Room::where('name',$room)->first()->users);
+        $room = Room::where('name',$room)->first();
+        // dd($room->id);
+        // dd(User::all(),Wifi::where('room',$room->id)->first()->users);
+        $users = UserResources::collection(Wifi::where('room',$room->id)->first()->users);
 
         return response()->json([
             'status' => true,
-            'message' => 'User Detail',
-            'data' => $json
+            'message' => 'Map Resources',
+            'data' => [
+                'user' => $users,
+            ]
         ],200);
     }
     
