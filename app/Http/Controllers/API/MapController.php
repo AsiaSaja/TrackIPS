@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\UpdateUserLocation;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\MapWifiResources;
 use App\Http\Resources\RoomResources;
@@ -24,6 +25,19 @@ class MapController extends Controller
                 'room' => $room,
                 'user' => $user,
             ]
+        ],200);
+    }
+
+    function userInRoom($room){
+
+        $fetch = Room::where('name',$room)->get();
+        dd($room);
+        $json = new UserResources(Room::where('name',$room)->first()->users);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'User Detail',
+            'data' => $json
         ],200);
     }
     
@@ -52,6 +66,8 @@ class MapController extends Controller
         $new->BSSID = $wifi;
         $new->save();
         
+        broadcast(new UpdateUserLocation($new));
+
         return response()->json([
             'status' => true,
             'message' => 'Change Location',
