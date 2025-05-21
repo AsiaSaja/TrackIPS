@@ -1,9 +1,85 @@
-import React from 'react';
-import { Link, Head, usePage } from '@inertiajs/react';
+import React, { useState, useEffect } from 'react';
+import { Link, Head, usePage, router } from '@inertiajs/react';
+import Map from '../User/Map';
+
+// MapSection component
+function MapSection({ user }) {
+  const [userPosition, setUserPosition] = useState([-6.409090, 108.281653]); // Default: ITS Surabaya
+  const [isLocationLoading, setIsLocationLoading] = useState(true);
+  
+
+  useEffect(() => {
+    // Simulasi mendapatkan lokasi pengguna
+    // Dalam implementasi nyata, ini bisa diganti dengan data dari sensor atau API
+    const getLocation = setTimeout(() => {
+      // Contoh: Lokasi disekitar ITS
+      const simulatedPosition = [
+        -6.409090 + (Math.random() * 0.002 - 0.001),
+        108.281653 + (Math.random() * 0.002 - 0.001)
+      ];
+      setUserPosition(simulatedPosition);
+      setIsLocationLoading(false);
+    }, 1500);
+
+    return () => clearTimeout(getLocation);
+  }, []);
+
+  return (
+    <div className="p-6">
+      <div className="mb-6">
+        <h3 className="text-xl font-semibold text-gray-900">Your Current Location</h3>
+        <p className="text-gray-600">Welcome, {user.name}. Here's your real-time location.</p>
+      </div>
+      
+      {isLocationLoading ? (
+        <div className="flex justify-center items-center h-[500px] bg-gray-100 rounded-lg">
+          <div className="text-center">
+            <svg className="animate-spin h-10 w-10 text-indigo-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p>Mendapatkan lokasi Anda...</p>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <Map position={userPosition} />
+          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+            <h3 className="text-lg font-medium text-blue-900">Informasi Lokasi</h3>
+            <p className="mt-2">Latitude: {userPosition[0].toFixed(6)}</p>
+            <p>Longitude: {userPosition[1].toFixed(6)}</p>
+            <p className="mt-2 text-sm text-blue-700">
+              * Posisi saat ini disimulasikan untuk demonstrasi
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function Index() {
-  const { auth } = usePage().props;
+  const { auth, csrf_token } = usePage().props;
   const user = auth?.user;
+
+  const handleLogout = () => {
+    router.post('/logout', {}, {
+      headers: {
+        'X-CSRF-TOKEN': csrf_token // Gunakan nilai yang sudah diambil di level atas
+      },
+      preserveState: false,
+      preserveScroll: false,
+      onSuccess: () => {
+        router.visit('/login'), {
+          replace: true,
+          only: [],
+        };
+      },
+      onError: () => {
+        window.location.href = '/login';
+      }
+    });
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -27,20 +103,15 @@ export default function Index() {
               {user ? (
                 <div className="flex items-center space-x-4">
                   <span className="text-gray-700">Welcome, {user.name}</span>
-                  <Link
-                    href="/dashboard"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/logout"
-                    method="post"
-                    as="button"
+                  <a href="#map-section" className="text-indigo-600 hover:text-indigo-800">
+                    Map Tracking
+                  </a>
+                  <button
+                    onClick={handleLogout}
                     className="text-gray-600 hover:text-gray-900"
                   >
                     Logout
-                  </Link>
+                  </button>
                 </div>
               ) : (
                 <div className="flex items-center space-x-4">
@@ -226,6 +297,27 @@ export default function Index() {
           </div>
         </div>
       </div>
+
+      {/* Map Tracking Section - Hanya ditampilkan jika user login */}
+      {user && (
+        <div id="map-section" className="py-16 bg-gray-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-base font-semibold text-indigo-600 tracking-wide uppercase">Location Tracking</h2>
+              <p className="mt-1 text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight">
+                Track Your Location
+              </p>
+              <p className="max-w-xl mt-5 mx-auto text-xl text-gray-500">
+                See your current position in real-time with our advanced tracking system
+              </p>
+            </div>
+
+            <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+              <MapSection user={user} />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* CTA Section */}
       <div className="bg-indigo-700">

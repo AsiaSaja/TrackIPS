@@ -1,17 +1,124 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, Head, useForm } from '@inertiajs/react';
 
 export default function Register() {
-  const { data, setData, post, processing, errors } = useForm({
+  const { data, setData, post, processing, errors, reset } = useForm({
     name: '',
     email: '',
     password: '',
     password_confirmation: '',
   });
 
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('error'); // 'error' or 'success'
+  
+  // Check for errors
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      const firstError = Object.values(errors)[0];
+      setAlertMessage(firstError);
+      setAlertType('error');
+      setShowAlert(true);
+      
+      // Scroll ke atas untuk melihat pesan error
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [errors]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    post('/register');
+    
+    console.log('Submitting form with data:', data);
+    
+    // Validate password format before submission
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/;
+    if (data.password.length < 8) {
+      setAlertMessage('Password must be at least 8 characters');
+      setAlertType('error');
+      setShowAlert(true);
+      return;
+    }
+    
+    if (!passwordRegex.test(data.password)) {
+      setAlertMessage('Password must contain at least one uppercase letter, one lowercase letter, and one number');
+      setAlertType('error');
+      setShowAlert(true);
+      return;
+    }
+    
+    if (data.password !== data.password_confirmation) {
+      setAlertMessage('Passwords do not match');
+      setAlertType('error');
+      setShowAlert(true);
+      return;
+    }
+    
+    // Use XMLHttpRequest instead of fetch for better browser compatibility
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/register', true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.setRequestHeader('Accept', 'application/json');
+    
+    // Get CSRF token from meta tag
+    const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    if (token) {
+      xhr.setRequestHeader('X-CSRF-TOKEN', token);
+    }
+    
+    xhr.onreadystatechange = function() {
+      if (xhr.readyState === 4) {
+        console.log('Response status:', xhr.status);
+        console.log('Response headers:', xhr.getAllResponseHeaders());
+        console.log('Response text:', xhr.responseText.substring(0, 200) + '...');
+        
+        if (xhr.status >= 200 && xhr.status < 300) {
+          // Success
+          setAlertMessage('Registration successful! Redirecting to login...');
+          setAlertType('success');
+          setShowAlert(true);
+          reset();
+          
+          // Log the successful registration
+          console.log('Registration successful');
+          
+          // Redirect to login page
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+        } else {
+          // Error handling
+          let errorMessage = 'Registration failed. Please try again.';
+          
+          try {
+            const response = JSON.parse(xhr.responseText);
+            if (response.errors) {
+              const firstError = Object.values(response.errors)[0];
+              errorMessage = Array.isArray(firstError) ? firstError[0] : firstError;
+            } else if (response.message) {
+              errorMessage = response.message;
+            }
+          } catch (e) {
+            console.error('Error parsing response:', e);
+          }
+          
+          setAlertMessage(errorMessage);
+          setAlertType('error');
+          setShowAlert(true);
+        }
+      }
+    };
+    
+    // Create form data for submission
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('email', data.email);
+    formData.append('password', data.password);
+    formData.append('password_confirmation', data.password_confirmation);
+    formData.append('_token', token);
+    
+    console.log('Sending registration data with form data');
+    xhr.send(formData);
   };
 
   return (
@@ -54,6 +161,21 @@ export default function Register() {
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          {/* Alert Component */}
+          {showAlert && (
+              <div className={`mb-4 ${alertType === 'error' ? 'bg-red-50 border-red-500' : 'bg-green-50 border-green-500'} border-l-4 p-4 rounded-md`}>
+                {/* ... (kode SVG dan tombol close tetap sama) */}
+                <div className="ml-3">
+                  <h3 className={`text-sm font-medium ${alertType === 'error' ? 'text-red-800' : 'text-green-800'}`}>
+                    {alertType === 'error' ? 'Registration Error' : 'Success'}
+                  </h3>
+                  <div className={`mt-1 text-sm ${alertType === 'error' ? 'text-red-700' : 'text-green-700'}`}>
+                    {alertMessage}
+                  </div>
+                </div>
+              </div>
+            )}
+
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
