@@ -43,6 +43,10 @@ jobs:
     - name: Install NPM
       run: |
         npm install
+    
+    - name: Build assets
+      run: |
+        npm run build
 
     - name: Configure MySQL
       run: |
@@ -134,9 +138,15 @@ jobs:
           sudo chmod -R 755 /var/www/trackips/storage
           sudo chmod -R 755 /var/www/trackips/bootstrap/cache
 
+          # Set permissions khusus untuk folder build
+          sudo chown -R www-data:www-data /var/www/trackips/public/build
+          sudo chmod -R 775 /var/www/trackips/public/build
+
           # Run deployment commands
           cd /var/www/trackips
           sudo -u www-data composer install --optimize-autoloader --no-dev
+          sudo -u www-data npm install --production
+          sudo -u www-data npm run build
           sudo -u www-data php artisan config:cache
           sudo -u www-data php artisan route:cache
           sudo -u www-data php artisan view:cache
