@@ -67,7 +67,7 @@ Route::get('/', function () {
 
 // Test route
 Route::get('/tes', function () {
-    return dd(Room::where('floor',1)->first()->wifis);
+    return "Oke";
 });
 
 // Debug route to test redirection
